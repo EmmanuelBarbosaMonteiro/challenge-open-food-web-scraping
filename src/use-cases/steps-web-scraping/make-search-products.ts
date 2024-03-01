@@ -18,10 +18,17 @@ export async function makeSearchProducts(
   nutritionCriteria: string,
 ): Promise<ProductData[]> {
   const urlOpenFoodFacts = 'https://br.openfoodfacts.org/cgi/search.pl'
+
+  console.log('Iniciando o navegador...')
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
+
+  console.log(`Acessando a URL: https://br.openfoodfacts.org/cgi/search.pl`)
   await page.goto(urlOpenFoodFacts)
 
+  console.log(
+    'Configurando critérios de pesquisa para NOVA e graus de nutrição...',
+  )
   await page.waitForSelector('#tagtype_0')
   await page.select('#tagtype_0', 'nova_groups')
   await page.waitForSelector('#tagtype_1')
@@ -29,6 +36,7 @@ export async function makeSearchProducts(
   await page.type('input[name="tag_0"]', novaCriteria)
   await page.type('input[name="tag_1"]', nutritionCriteria)
 
+  console.log('Submetendo a pesquisa...')
   await page.click('#sort_by')
   await page.waitForSelector('#tagtype_2')
   await page.select('#tagtype_2', 'nova_groups')
@@ -39,6 +47,7 @@ export async function makeSearchProducts(
     page.waitForNavigation({ waitUntil: 'networkidle0' }),
   ])
 
+  console.log('Verificando se há produtos disponíveis...')
   const isNoProductsElementPresent = await page.evaluate(() => {
     return document.body.innerText.includes('Sem produtos.')
   })
@@ -46,6 +55,7 @@ export async function makeSearchProducts(
   let data: ProductData[] = []
 
   if (!isNoProductsElementPresent) {
+    console.log('Coletando dados dos produtos...')
     await page.waitForSelector('#products_match_all')
 
     data = await page.evaluate(() => {
@@ -95,6 +105,9 @@ export async function makeSearchProducts(
     })
   }
 
+  console.log('Fechando o navegador...')
   await browser.close()
+
+  console.log('Processo concluido.')
   return data
 }

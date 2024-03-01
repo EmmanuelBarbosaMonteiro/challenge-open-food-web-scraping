@@ -22,9 +22,12 @@ export async function makeSearchProductsById(
   idProduct: string,
 ): Promise<ProductDetails | null> {
   const urlOpenFoodFacts = `https://br.openfoodfacts.org/produto/${idProduct}`
+
+  console.log('Iniciando o navegador...')
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
 
+  console.log(`Acessando a URL do produto: ${urlOpenFoodFacts}`)
   await page.goto(urlOpenFoodFacts)
 
   const getTextContent = async (selector: string): Promise<string> => {
@@ -38,13 +41,18 @@ export async function makeSearchProductsById(
   const isProductNotFound = (await page.$('.title-1')) === null
   if (isProductNotFound) {
     await browser.close()
+
+    console.log('Produto não encontrado. Encerrando processo.')
     return null
   }
+
+  console.log('Coletando informações básicas do produto...')
   const title = await getTextContent('.title-1')
 
   const quantity = await getTextContent('#field_quantity_value')
   const hasPalmOil = 'unknown'
 
+  console.log('Determinando status vegano e vegetariano do produto...')
   const categoriesAndLabels = await page.evaluate(() => {
     const categories = Array.from(
       document.querySelectorAll('#field_categories_value .tag'),
@@ -64,16 +72,19 @@ export async function makeSearchProductsById(
     return { isVegan, isVegetarian }
   })
 
+  console.log('Coletando lista de ingredientes...')
   const ingredientsList = await getTextContent(
     '#panel_ingredients_content .panel_text',
   )
 
+  console.log('Avaliando Nutri-Score...')
   const nutritionScore = await page.$eval('.attr_text h4', (el) => {
     const fullText = el.innerText
     const scoreMatch = fullText.match(/Nutri-Score\s([A-E])/)
     return scoreMatch ? scoreMatch[1] : null
   })
 
+  console.log('Coletando valores nutricionais...')
   const nutritionValues = await page.evaluate(() => {
     const panels = Array.from(document.querySelectorAll('.panel_accordion'))
     return panels
@@ -100,6 +111,7 @@ export async function makeSearchProductsById(
       .slice(0, 3)
   })
 
+  console.log('Determinando o tamanho da porção...')
   const servingSizeElement = await page.$('#panel_serving_size .panel_text')
   const servingSize = servingSizeElement
     ? await page.evaluate((el) => {
@@ -109,6 +121,7 @@ export async function makeSearchProductsById(
       }, servingSizeElement)
     : ''
 
+  console.log('Coletando dados da tabela nutricional...')
   const dataTable = await page.evaluate(() => {
     const rows = Array.from(document.querySelectorAll('tbody tr'))
     const nutritionData: {
@@ -119,7 +132,6 @@ export async function makeSearchProductsById(
     } = {}
 
     rows.forEach((row) => {
-      // Seu código existente para preencher nutritionData
       const nutrientName = row.querySelector('td')?.textContent?.trim() ?? ''
       const per100g = row.querySelectorAll('td')[1]?.textContent?.trim() ?? ''
       const perServing =
@@ -131,6 +143,7 @@ export async function makeSearchProductsById(
     return nutritionData
   })
 
+  console.log('Determinando informações do grupo NOVA...')
   const novaInfo = await page.evaluate(() => {
     const imgElement = document.querySelector(
       'a[href="#panel_nova_content"] img',
@@ -158,8 +171,10 @@ export async function makeSearchProductsById(
     }
   })
 
+  console.log('Finalizando o navegador e retornando os dados coletados.')
   await browser.close()
 
+  console.log('Processo concluido.')
   return {
     title,
     quantity,

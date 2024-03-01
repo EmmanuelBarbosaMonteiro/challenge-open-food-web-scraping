@@ -13,8 +13,18 @@ export async function appRoutes(app: FastifyInstance) {
         querystring: {
           type: 'object',
           properties: {
-            nutrition: { type: 'string', description: 'Nutrition grade' },
-            nova: { type: 'string', description: 'NOVA group' },
+            nutrition: {
+              type: 'string',
+              description:
+                'Nutrition grade (Nutri-Score) from A (healthiest) to E (least healthy).',
+              enum: ['A', 'B', 'C', 'D', 'E'],
+            },
+            nova: {
+              type: 'string',
+              description:
+                'NOVA group classification from 1 (unprocessed or minimally processed) to 4 (ultra-processed).',
+              enum: ['1', '2', '3', '4'],
+            },
           },
           required: ['nutrition', 'nova'],
         },
