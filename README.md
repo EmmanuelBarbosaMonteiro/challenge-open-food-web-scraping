@@ -23,7 +23,7 @@ Instale as dependências:
 
    git clone https://github.com/EmmanuelBarbosaMonteiro/challenge-open-food-web-scraping.git
 
-   cd <nome-da-pasta-do-repositorio>
+   cd challenge-open-food-web-scraping
 
    npm install
    
