@@ -22,9 +22,7 @@ export async function fetchProductDetails(
     console.error(error)
 
     if (error instanceof z.ZodError) {
-      return reply
-        .status(400)
-        .send({ message: 'Invalid request data.', errors: error.errors })
+      return reply.status(400).send({ message: 'Invalid request data.' })
     } else {
       return reply.status(500).send({ message: 'Internal server error.' })
     }
