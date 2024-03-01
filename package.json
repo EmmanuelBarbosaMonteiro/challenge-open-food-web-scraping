@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@fastify/cors": "9.0.1",
     "@rocketseat/eslint-config": "2.2.2",
     "@types/node": "20.11.24",
     "eslint": "8.57.0",

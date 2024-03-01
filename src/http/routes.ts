@@ -86,7 +86,7 @@ export async function appRoutes(app: FastifyInstance) {
         params: {
           type: 'object',
           properties: {
-            id: {
+            idProduct: {
               type: 'string',
               description: 'Product ID',
             },

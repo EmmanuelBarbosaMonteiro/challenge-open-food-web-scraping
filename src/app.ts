@@ -1,4 +1,5 @@
 import fastify from 'fastify'
+import cors from '@fastify/cors'
 import { ZodError } from 'zod'
 import { appRoutes } from './http/routes'
 import { env } from './env'
@@ -7,16 +8,24 @@ import fastifySwagger from '@fastify/swagger'
 
 export const app = fastify()
 
+app.register(cors, {
+  origin: ['http://localhost:3333'],
+  exposedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'accept',
+    'Origin',
+    'Access-Control-Allow-Credentials',
+  ],
+})
+
 app.register(fastifySwagger, {
   swagger: {
     info: {
       title: 'Challenge Open Food Web Scraping',
       version: '0.1.0',
     },
-    host: 'localhost',
-    schemes: ['http'],
-    consumes: ['application/json'],
-    produces: ['application/json'],
   },
 })
 app.register(fastifySwaggerUi, {

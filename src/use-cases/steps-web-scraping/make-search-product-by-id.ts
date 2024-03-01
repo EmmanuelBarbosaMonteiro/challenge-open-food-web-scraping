@@ -20,7 +20,7 @@ export interface ProductDetails {
 
 export async function makeSearchProductsById(
   idProduct: string,
-): Promise<ProductDetails> {
+): Promise<ProductDetails | null> {
   const urlOpenFoodFacts = `https://br.openfoodfacts.org/produto/${idProduct}`
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
@@ -35,7 +35,13 @@ export async function makeSearchProductsById(
     return ''
   }
 
+  const isProductNotFound = (await page.$('.title-1')) === null
+  if (isProductNotFound) {
+    await browser.close()
+    return null
+  }
   const title = await getTextContent('.title-1')
+
   const quantity = await getTextContent('#field_quantity_value')
   const hasPalmOil = 'unknown'
 
