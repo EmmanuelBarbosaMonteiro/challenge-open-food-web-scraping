@@ -21,7 +21,7 @@ Instale as dependências:
    
    ```bash
 
-   git clone <url-do-repositorio>
+   git clone https://github.com/EmmanuelBarbosaMonteiro/challenge-open-food-web-scraping.git
 
    cd <nome-da-pasta-do-repositorio>
 
